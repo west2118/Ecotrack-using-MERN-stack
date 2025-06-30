@@ -1,102 +1,267 @@
-import Image from "next/image";
+// app/page.tsx
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import {
+  Leaf,
+  Activity,
+  Lightbulb,
+  Trophy,
+  Users,
+  BarChart2,
+  Target,
+  ChevronRight,
+  Sparkles,
+} from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Navbar */}
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm">
+        <div className="container mx-auto flex h-16 items-center justify-between px-5">
+          <div className="flex items-center gap-2">
+            <Leaf className="h-5 w-5 text-green-600" />
+            <span className="text-lg font-semibold text-green-800">
+              EcoTrack
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="text-green-700 hover:bg-green-50 px-3">
+              Sign In
+            </Button>
+            <Button className="bg-green-600 hover:bg-green-700 px-4 text-white">
+              Sign Up
+            </Button>
+          </div>
         </div>
+      </header>
+
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="w-full py-16 md:py-20">
+          <div className="container mx-auto px-5">
+            <div className="grid items-center gap-10 lg:grid-cols-2">
+              <div className="space-y-5">
+                <div className="inline-flex items-center rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Sustainable Living Made Simple
+                </div>
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                  Track & Reduce Your{" "}
+                  <span className="text-green-600">Carbon Footprint</span>
+                </h1>
+                <p className="text-lg text-gray-600 max-w-[540px]">
+                  EcoTrack helps you understand and minimize your environmental
+                  impact through data-driven insights and achievable challenges.
+                </p>
+                <div className="flex flex-col gap-3 sm:flex-row pt-1">
+                  <Button className="bg-green-600 hover:bg-green-700 h-12 px-6 text-white">
+                    Get Started
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-12 px-6 border-gray-300 text-gray-700 hover:bg-gray-50">
+                    Learn More
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-end mt-6 lg:mt-0">
+                <div className="relative w-full max-w-md aspect-square bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-inner flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[url('/grid.svg')] bg-[size:24px_24px] opacity-10"></div>
+                  <Leaf className="h-32 w-32 text-green-600" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="w-full py-14 bg-gray-50">
+          <div className="container mx-auto px-5">
+            <div className="mx-auto max-w-3xl text-center space-y-4">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Sustainable Living Features
+              </h2>
+              <p className="text-lg text-gray-600">
+                Everything you need to make meaningful environmental changes
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  icon: Activity,
+                  title: "Carbon Tracking",
+                  desc: "Monitor daily activities and their environmental impact",
+                },
+                {
+                  icon: Lightbulb,
+                  title: "AI Suggestions",
+                  desc: "Personalized recommendations to reduce your footprint",
+                },
+                {
+                  icon: Trophy,
+                  title: "Eco Challenges",
+                  desc: "Earn badges by completing sustainability goals",
+                },
+                {
+                  icon: Users,
+                  title: "Community",
+                  desc: "Compare progress with friends and groups",
+                },
+                {
+                  icon: BarChart2,
+                  title: "Progress Reports",
+                  desc: "Visualize your impact over time",
+                },
+                {
+                  icon: Target,
+                  title: "Custom Goals",
+                  desc: "Set and track personal sustainability targets",
+                },
+              ].map((feature, index) => (
+                <Card
+                  key={index}
+                  className="border-0 shadow-sm hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-50 mb-3">
+                      <feature.icon className="h-6 w-6 text-green-600" />
+                    </div>
+                    <CardTitle className="text-gray-900">
+                      {feature.title}
+                    </CardTitle>
+                    <CardDescription className="text-gray-600">
+                      {feature.desc}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="w-full py-14">
+          <div className="container mx-auto px-5">
+            <div className="mx-auto max-w-4xl space-y-4 text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Trusted by Eco-Conscious Individuals
+              </h2>
+              <p className="text-lg text-gray-600">
+                Join thousands already reducing their environmental impact
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {[
+                {
+                  name: "Sarah K.",
+                  role: "Environmental Scientist",
+                  quote:
+                    "EcoTrack transformed how I approach sustainability. The data visualization makes complex environmental concepts accessible.",
+                },
+                {
+                  name: "Michael T.",
+                  role: "Urban Planner",
+                  quote:
+                    "The challenges gamify sustainability in a way that's actually motivating. My team competes to earn badges each month.",
+                },
+                {
+                  name: "Priya M.",
+                  role: "Sustainability Educator",
+                  quote:
+                    "I recommend EcoTrack to all my students. It makes abstract environmental concepts tangible and actionable.",
+                },
+              ].map((testimonial, index) => (
+                <Card key={index} className="border-0 shadow-sm">
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center">
+                        <Users className="h-5 w-5 text-green-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">
+                          {testimonial.name}
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          {testimonial.role}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-gray-600">{testimonial.quote}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="w-full py-14 bg-green-600">
+          <div className="container mx-auto px-5">
+            <div className="mx-auto max-w-4xl space-y-4 text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Ready to make a difference?
+              </h2>
+              <p className="text-lg text-green-100">
+                Join our community of environmentally conscious individuals
+                today.
+              </p>
+              <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+                <Button className="bg-white text-green-700 hover:bg-green-50 h-12 px-8">
+                  Start Your Journey
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-12 px-8 border-white text-white hover:bg-white/10">
+                  Learn More
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="w-full bg-gray-50">
+        <div className="container mx-auto px-5 py-10">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div className="flex items-center gap-2">
+              <Leaf className="h-5 w-5 text-green-600" />
+              <span className="text-lg font-semibold text-green-800">
+                EcoTrack
+              </span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-5 text-sm text-gray-600">
+              <a href="#" className="hover:text-green-600">
+                About
+              </a>
+              <a href="#" className="hover:text-green-600">
+                Features
+              </a>
+              <a href="#" className="hover:text-green-600">
+                Pricing
+              </a>
+              <a href="#" className="hover:text-green-600">
+                Blog
+              </a>
+              <a href="#" className="hover:text-green-600">
+                Contact
+              </a>
+            </div>
+          </div>
+          <div className="mt-10 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
+            © 2025 EcoTrack. All rights reserved.
+          </div>
+        </div>
       </footer>
     </div>
   );
