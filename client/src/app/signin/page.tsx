@@ -8,28 +8,6 @@ import Link from "next/link";
 export default function SignInPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header with Logo */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="container flex h-16 items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-2">
-            <Leaf className="h-5 w-5 text-green-600" />
-            <span className="text-lg font-semibold text-green-800">
-              EcoTrack
-            </span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">New to EcoTrack?</span>
-            <Link href="/sign-up">
-              <Button
-                variant="ghost"
-                className="text-green-700 hover:bg-green-50 px-3">
-                Sign Up
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center py-12">
         <div className="container px-5">

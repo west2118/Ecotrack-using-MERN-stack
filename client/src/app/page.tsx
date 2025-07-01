@@ -22,28 +22,6 @@ import {
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-5">
-          <div className="flex items-center gap-2">
-            <Leaf className="h-5 w-5 text-green-600" />
-            <span className="text-lg font-semibold text-green-800">
-              EcoTrack
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              className="text-green-700 hover:bg-green-50 px-3">
-              Sign In
-            </Button>
-            <Button className="bg-green-600 hover:bg-green-700 px-4 text-white">
-              Sign Up
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-16 md:py-20">
@@ -75,7 +53,7 @@ export default function Home() {
               </div>
               <div className="flex justify-end mt-6 lg:mt-0">
                 <div className="relative w-full max-w-md aspect-square bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-inner flex items-center justify-center">
-                  <div className="absolute inset-0 bg-[url('/grid.svg')] bg-[size:24px_24px] opacity-10"></div>
+                  <div className="absolute inset-0 bg-[size:24px_24px] opacity-10"></div>
                   <Leaf className="h-32 w-32 text-green-600" />
                 </div>
               </div>
