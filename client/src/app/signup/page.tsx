@@ -1,11 +1,21 @@
-// app/sign-up/page.tsx
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Leaf } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    router.push("/onboarding");
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Main Content */}
@@ -25,7 +35,7 @@ export default function SignUpPage() {
             </div>
 
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-              <form className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-gray-700">
                     Full Name

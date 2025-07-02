@@ -1,5 +1,6 @@
 import { Leaf } from "lucide-react";
 import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Link from "next/link";
 
 const Navbar = () => {
@@ -21,6 +22,10 @@ const Navbar = () => {
             className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white text-sm font-medium">
             Sign Up
           </Link>
+          {/* <Avatar className="h-8 w-8">
+            <AvatarImage src="/avatars/user.jpg" />
+            <AvatarFallback>YO</AvatarFallback>
+          </Avatar> */}
         </div>
       </div>
     </header>

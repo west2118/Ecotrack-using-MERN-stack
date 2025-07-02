@@ -1,5 +1,7 @@
-import Navbar from "@/components/sections/navbar";
+import Navbar from "@/components/sections/Navbar";
 import "./globals.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export const metadata = {
   title: "Next.js",
@@ -15,7 +17,10 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        <main>{children}</main>
+        <main>
+          {children}
+          <ToastContainer position="top-right" autoClose={3000} />
+        </main>
         <footer></footer>
       </body>
     </html>

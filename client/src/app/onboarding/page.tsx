@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,32 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
+import { useRouter } from "next/navigation";
 
 export default function OnboardingPage() {
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-gray-50">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6 text-emerald-600">
-              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5 3.87 4 4 0 0 0-5-5 4 4 0 0 1 3.87-5z"></path>
-            </svg>
-            <span className="font-bold text-emerald-600">EcoTrack</span>
-          </div>
-          <Progress value={66} className="w-[200px] h-2" />
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="space-y-8">
@@ -59,51 +42,35 @@ export default function OnboardingPage() {
           {/* Location Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Step 1: Your Location</CardTitle>
+              <CardTitle>Your Location</CardTitle>
               <CardDescription>
                 Carbon impact varies by region - select yours for accurate
                 calculations
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Country</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
-                      <SelectItem value="ca">Canada</SelectItem>
-                      <SelectItem value="au">Australia</SelectItem>
-                      <SelectItem value="de">Germany</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Region/State</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="California" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ca">California</SelectItem>
-                      <SelectItem value="ny">New York</SelectItem>
-                      <SelectItem value="tx">Texas</SelectItem>
-                      <SelectItem value="fl">Florida</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    <SelectItem value="us">United States</SelectItem>
+                    <SelectItem value="uk">United Kingdom</SelectItem>
+                    <SelectItem value="ca">Canada</SelectItem>
+                    <SelectItem value="au">Australia</SelectItem>
+                    <SelectItem value="de">Germany</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
 
-          {/* Sustainability Goals Card */}
+          {/* Goals Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Step 2: Set Your Goals</CardTitle>
+              <CardTitle>Set Your Goals</CardTitle>
               <CardDescription>
                 What would you like to achieve with EcoTrack?
               </CardDescription>
@@ -112,10 +79,10 @@ export default function OnboardingPage() {
               <div className="space-y-2">
                 <Label>Main Sustainability Goal</Label>
                 <Select>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select your primary goal" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="reduce">
                       Reduce my carbon footprint
                     </SelectItem>
@@ -135,10 +102,10 @@ export default function OnboardingPage() {
               <div className="space-y-2">
                 <Label>Weekly Carbon Reduction Target</Label>
                 <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Moderate (10% reduction)" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select target" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="light">Light (5% reduction)</SelectItem>
                     <SelectItem value="moderate">
                       Moderate (10% reduction)
@@ -155,61 +122,15 @@ export default function OnboardingPage() {
             </CardContent>
           </Card>
 
-          {/* Tracking Preferences Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Step 3: Tracking Preferences</CardTitle>
-              <CardDescription>
-                Select which lifestyle categories you want to track
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                  <Checkbox id="transport" checked />
-                  <div className="space-y-1">
-                    <Label htmlFor="transport">Transportation</Label>
-                    <p className="text-sm text-gray-600">
-                      Commute, flights, vehicle usage
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                  <Checkbox id="diet" checked />
-                  <div className="space-y-1">
-                    <Label htmlFor="diet">Diet</Label>
-                    <p className="text-sm text-gray-600">
-                      Food choices, meal types
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                  <Checkbox id="energy" checked />
-                  <div className="space-y-1">
-                    <Label htmlFor="energy">Energy Use</Label>
-                    <p className="text-sm text-gray-600">
-                      Electricity, heating, appliances
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 border rounded-lg">
-                  <Checkbox id="purchases" />
-                  <div className="space-y-1">
-                    <Label htmlFor="purchases">Purchases</Label>
-                    <p className="text-sm text-gray-600">
-                      Shopping habits, packaging
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline">Back</Button>
-              <Button className="bg-emerald-600 hover:bg-emerald-700">
-                Complete Setup
-              </Button>
-            </CardFooter>
-          </Card>
+          {/* Actions */}
+          <div className="flex justify-between">
+            <Button variant="outline">Back</Button>
+            <Button
+              onClick={() => router.push("/dashboard")}
+              className="bg-emerald-600 text-white hover:bg-emerald-700">
+              Complete Setup
+            </Button>
+          </div>
         </div>
       </main>
     </div>

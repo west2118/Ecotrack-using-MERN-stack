@@ -82,27 +82,6 @@ export default function MyLogsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-gray-50">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6 text-emerald-600">
-              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5 3.87 4 4 0 0 0-5-5 4 4 0 0 1 3.87-5z"></path>
-            </svg>
-            <span className="font-bold text-emerald-600">EcoTrack</span>
-          </div>
-          <Button variant="ghost">Add New</Button>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="space-y-6">
@@ -194,7 +173,7 @@ export default function MyLogsPage() {
                               ? "secondary"
                               : log.category === "Energy Use"
                               ? "outline"
-                              : "destructive"
+                              : "default"
                           }>
                           {log.category}
                         </Badge>

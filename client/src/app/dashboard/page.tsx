@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,34 +13,13 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-gray-50">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6 text-emerald-600">
-              <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5 3.87 4 4 0 0 0-5-5 4 4 0 0 1 3.87-5z"></path>
-            </svg>
-            <span className="font-bold text-emerald-600">EcoTrack</span>
-          </div>
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatars/user.jpg" />
-            <AvatarFallback>YO</AvatarFallback>
-          </Avatar>
-        </div>
-      </header>
+  const router = useRouter();
 
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-emerald-50 to-gray-50">
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -303,7 +284,10 @@ export default function DashboardPage() {
                 <CardTitle>Quick Navigation</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-2 gap-3">
-                <Button variant="outline" className="h-24 flex-col">
+                <Button
+                  onClick={() => router.push("/logs")}
+                  variant="outline"
+                  className="h-24 flex-col">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
