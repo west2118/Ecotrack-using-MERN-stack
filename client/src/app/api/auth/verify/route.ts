@@ -1,10 +1,11 @@
-import User from "@/app/models/user.model";
 import dbConnect from "@/lib/dbConnect";
 import { adminAuth } from "@/lib/firebaseAdmin";
+import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { token, fullName, email, country, goal, target } = await req.json();
+  const { token, email, firstName, lastName, country, goal, target } =
+    await req.json();
 
   try {
     const decoded = await adminAuth.verifyIdToken(token);
@@ -14,8 +15,9 @@ export async function POST(req: Request) {
       { uid: decoded.uid },
       {
         uid: decoded.uid,
-        fullName,
-        email,
+        email: decoded.email || email,
+        firstName,
+        lastName,
         country,
         goal,
         target,
@@ -23,10 +25,7 @@ export async function POST(req: Request) {
       { upsert: true, new: true }
     );
 
-    return NextResponse.json(
-      { message: "Logged in successfully!", user },
-      { status: 200 }
-    );
+    return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }

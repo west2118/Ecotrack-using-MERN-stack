@@ -7,6 +7,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { useSyncFirebaseUserInfo } from "@/hooks/useSyncFirebaseUserInfo";
 import {
   Leaf,
   Activity,
@@ -20,6 +21,8 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  useSyncFirebaseUserInfo();
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <main className="flex-1">

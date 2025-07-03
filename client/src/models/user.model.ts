@@ -3,8 +3,9 @@ import mongoose, { model, models, Schema } from "mongoose";
 const UserSchema = new Schema(
   {
     uid: { type: String, required: true, unique: true },
-    fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    firstName: { type: String },
+    lastName: { type: String },
     country: { type: String },
     goal: { type: String },
     target: { type: String },
