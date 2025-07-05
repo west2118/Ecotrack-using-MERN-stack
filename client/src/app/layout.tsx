@@ -2,6 +2,7 @@ import Navbar from "@/components/sections/Navbar";
 import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { UserSyncProvider } from "@/components/sections/UserSyncProvider";
 
 export const metadata = {
   title: "Next.js",
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body>
         <Navbar />
         <main>
+          <UserSyncProvider />
           {children}
           <ToastContainer position="top-right" autoClose={3000} />
         </main>

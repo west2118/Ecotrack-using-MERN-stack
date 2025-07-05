@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import { adminAuth } from "@/lib/firebaseAdmin";
+import { verifyToken } from "@/lib/middleware/verifyToken";
 import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 

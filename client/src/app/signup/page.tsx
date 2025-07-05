@@ -34,8 +34,6 @@ export default function SignUpPage() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    setIsLoading(true);
-
     if (Object.values(formData).some((value) => value.trim() === "")) {
       return toast.error("Missing Required Field");
     }
@@ -47,6 +45,8 @@ export default function SignUpPage() {
     if (!isAgree) {
       return toast.error("Plese check on agree terms");
     }
+
+    setIsLoading(true);
 
     try {
       const userCredential = await createUserWithEmailAndPassword(

@@ -11,11 +11,11 @@ export async function POST(req: Request) {
         type: "vehicle",
         distance_unit: "km",
         distance_value: body.distance,
-        vehicle_model_id: body.model,
+        vehicle_model_id: "7268a9b7-17e8-4c8d-acca-57059252afe9",
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.CARBON_API}`,
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_CARBON_API}`,
           "Content-Type": "application/json",
         },
       }

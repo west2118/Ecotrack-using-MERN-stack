@@ -1,23 +1,59 @@
+"use client";
+
 import { auth } from "@/lib/firebase";
 import { useUserStore } from "@/stores/useUserStore";
+import axios from "axios";
 import { useEffect } from "react";
 
 export const useSyncFirebaseUserInfo = () => {
-  const setToken = useUserStore((state) => state.setUserToken);
+  const setUserToken = useUserStore((state) => state.setUserToken);
+  const setUser = useUserStore((state) => state.setUser);
+  const clearUser = useUserStore((state) => state.clearUser);
 
   useEffect(() => {
-    const fetchInitialToken = async () => {
-      const currentToken = await auth.currentUser?.getIdToken();
-      setToken(currentToken ?? null);
+    const fetchUserInfo = async (token: string) => {
+      console.log("TOKEN: ", token);
+
+      try {
+        const response = await axios.get("/api/user/getUser", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log(response?.data?.user);
+
+        setUser(response?.data?.user);
+      } catch (error) {
+        clearUser();
+      }
     };
 
-    fetchInitialToken();
+    const syncAuth = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        clearUser();
+        return;
+      }
+
+      const token = await user.getIdToken();
+      setUserToken(token);
+      await fetchUserInfo(token);
+    };
+
+    syncAuth();
 
     const unsubscribe = auth.onIdTokenChanged(async (user) => {
       const newToken = await user?.getIdToken();
-      setToken(newToken ?? null);
+      setUserToken(newToken ?? null);
+
+      if (newToken) {
+        await fetchUserInfo(newToken);
+      } else {
+        clearUser();
+      }
     });
 
     return () => unsubscribe();
-  }, [setToken]);
+  }, [setUserToken, setUser, clearUser]);
 };

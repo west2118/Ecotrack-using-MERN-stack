@@ -1,17 +1,31 @@
 import { create } from "zustand";
 
+type User = {
+  _id: string;
+  uid: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  country: string;
+  goal: string;
+  target: string;
+  createdAt: string; // ISO string format
+  updatedAt: string; // ISO string format
+  __v: number;
+};
+
 type UserStore = {
   userToken: string | null;
-  userUid: string | null;
+  user: User | null;
   setUserToken: (token: string | null) => void;
-  setUserUid: (uid: string | null) => void;
-  clearAuth: () => void;
+  setUser: (user: User) => void;
+  clearUser: () => void;
 };
 
 export const useUserStore = create<UserStore>((set) => ({
+  user: null,
   userToken: null,
-  userUid: null,
+  setUser: (user) => set({ user }),
   setUserToken: (token) => set({ userToken: token }),
-  setUserUid: (uid) => set({ userUid: uid }),
-  clearAuth: () => set({ userToken: null, userUid: null }),
+  clearUser: () => set({ userToken: null, user: null }),
 }));

@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useUserStore } from "@/stores/useUserStore";
 import { useEffect, useState } from "react";
 
 const navButtons = [
