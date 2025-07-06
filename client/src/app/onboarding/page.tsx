@@ -145,8 +145,8 @@ export default function OnboardingPage() {
                   </SelectTrigger>
                   <SelectContent className="bg-white">
                     {countries.map((country) => (
-                      <SelectItem key={country} value={country}>
-                        {country}
+                      <SelectItem key={country.value} value={country.value}>
+                        {country.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

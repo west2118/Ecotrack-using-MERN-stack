@@ -13,24 +13,25 @@ import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type FormData = {
-  distance: string;
+  watts: string;
   notes: string;
 };
 
-const TransportForm = () => {
+const ElectricityForm = () => {
   const router = useRouter();
   const token = useUserStore((state) => state.userToken);
-  const userUid = useUserStore((state) => state.user?.uid);
+  const user = useUserStore((state) => state.user);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { formData, handleChange } = useForm<FormData>({
-    distance: "",
+    watts: "",
     notes: "",
   });
 
-  const getCO2 = async (distance: number) => {
+  const getCO2 = async (watts: number) => {
     try {
-      const response = await axios.post("/api/emissions/transport", {
-        distance,
+      const response = await axios.post("/api/emissions/electricity", {
+        watts,
+        country: user?.country,
       });
 
       return response.data.data.attributes.carbon_kg;
@@ -49,27 +50,29 @@ const TransportForm = () => {
     setIsLoading(true);
 
     try {
-      const CO2 = await getCO2(Number(formData.distance));
+      const CO2 = await getCO2(Number(formData.watts));
 
-      const response = await axios.post(
-        "/api/act/postAct",
-        {
-          CO2,
-          category: "Transport",
-          activity: "Drove a car",
-          details: formData.distance,
-          note: formData.notes,
-          userUid,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      if (CO2) {
+        const response = await axios.post(
+          "/api/act/postAct",
+          {
+            CO2,
+            category: "Energy Use",
+            activity: "Air Conditioning",
+            details: formData.watts,
+            note: formData.notes,
+            user: user?.uid,
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      console.log(response.data);
-      router.push("/logs");
+        console.log(response.data);
+        router.push("/logs");
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.message || error.message);
     } finally {
@@ -81,10 +84,10 @@ const TransportForm = () => {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label>Distance (km)</Label>
+          <Label>Watts (mwh)</Label>
           <Input
-            name="distance"
-            value={formData.distance}
+            name="watts"
+            value={formData.watts}
             onChange={handleChange}
             className="py-4.5"
             type="text"
@@ -120,4 +123,4 @@ const TransportForm = () => {
   );
 };
 
-export default TransportForm;
+export default ElectricityForm;

@@ -4,8 +4,7 @@ import Act from "@/models/act.model";
 import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  const { category, activity, details, CO2, note, item } = await req.json();
+export async function GET(req: Request) {
   const result = await verifyToken(req);
 
   if (!result.success) return result.response;
@@ -23,21 +22,11 @@ export async function POST(req: Request) {
       );
     }
 
-    const newAct = new Act({
-      userUid: decoded.uid,
-      category,
-      activity,
-      details,
-      CO2,
-      note,
-      ...(item ? { item } : {}),
-    });
-    await newAct.save();
+    const acts = await Act.find({ userUid: decoded.uid });
 
-    return NextResponse.json(
-      { message: "Created activity successfully!", newAct },
-      { status: 200 }
-    );
+    if (!acts) return;
+
+    return NextResponse.json({ acts }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },

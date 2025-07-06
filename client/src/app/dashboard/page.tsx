@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import DailyImpactCard from "@/components/layout/DailyImpactCard";
 import QuickLogCard from "@/components/layout/QuickLogCard";
+import SuggestionCard from "@/components/layout/SuggestionCard";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -37,40 +38,7 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-6">
             {/* AI Tip of the Day */}
-            <Card>
-              <CardHeader>
-                <CardTitle>AI Sustainability Tip</CardTitle>
-                <CardDescription>Powered by OpenAI</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="p-4 bg-emerald-50 rounded-lg">
-                  <p className="text-gray-700">
-                    "Try meatless Mondays! Replacing beef with plant-based
-                    proteins just one day a week can reduce your annual carbon
-                    footprint by about 5%. Start small with lentil chili or
-                    mushroom burgers."
-                  </p>
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <Button variant="ghost" size="sm">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    More Tips
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <SuggestionCard />
 
             {/* Navigation Card */}
             <Card>
@@ -101,7 +69,10 @@ export default function DashboardPage() {
                   </svg>
                   My Logs
                 </Button>
-                <Button variant="outline" className="h-24 flex-col">
+                <Button
+                  onClick={() => router.push("/suggestions")}
+                  variant="outline"
+                  className="h-24 flex-col">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"

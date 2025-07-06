@@ -1,7 +1,9 @@
 "use client";
 
+import ElectricityForm from "@/components/layout/EletricityForm";
+import FoodForm from "@/components/layout/FoodForm";
+import PurchasesForm from "@/components/layout/PurchasesForm";
 import TransportForm from "@/components/layout/TransportForm";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -10,18 +12,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useUserStore } from "@/stores/useUserStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const navButtons = [
   {
@@ -65,7 +56,7 @@ const navButtons = [
     ),
   },
   {
-    label: "Energy",
+    label: "Electricity",
     icon: (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -137,6 +128,9 @@ export default function AddActivityPage() {
 
             {/* Transport Form (active tab) */}
             {activeTab === "Transport" && <TransportForm />}
+            {activeTab === "Electricity" && <ElectricityForm />}
+            {activeTab === "Foods" && <FoodForm />}
+            {activeTab === "Purchases" && <PurchasesForm />}
           </CardContent>
         </Card>
       </main>

@@ -8,6 +8,7 @@ const ActSchema = new Schema(
     details: { type: String, required: true },
     CO2: { type: Number, required: true },
     note: { type: String, required: true },
+    food: { type: String },
   },
   { timestamps: true }
 );

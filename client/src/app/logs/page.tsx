@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,66 +26,55 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useUserStore } from "@/stores/useUserStore";
+import { toast } from "react-toastify";
+import { formatDate } from "@/constants/formatDate";
+import { formatTimeWithIntl } from "@/constants/formatTimeWithIntl";
+import { getUnit } from "@/constants/getUnit";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function MyLogsPage() {
-  // Fake data for logs
-  const logs = [
-    {
-      id: 1,
-      date: "2025-06-15",
-      time: "08:30",
-      category: "Transport",
-      activity: "Drove car (gasoline)",
-      details: "15 km",
-      co2: "3.45 kg",
-      notes: "Commute to work",
-    },
-    {
-      id: 2,
-      date: "2025-06-14",
-      time: "19:15",
-      category: "Diet",
-      activity: "Beef meal",
-      details: "200g",
-      co2: "2.8 kg",
-      notes: "Dinner at steakhouse",
-    },
-    {
-      id: 3,
-      date: "2025-06-14",
-      time: "12:00",
-      category: "Transport",
-      activity: "Took train",
-      details: "20 km",
-      co2: "0.4 kg",
-      notes: "Lunch meeting downtown",
-    },
-    {
-      id: 4,
-      date: "2025-06-13",
-      time: "10:00",
-      category: "Energy Use",
-      activity: "Air conditioning",
-      details: "3 hours",
-      co2: "1.2 kg",
-      notes: "Home office",
-    },
-    {
-      id: 5,
-      date: "2025-06-12",
-      time: "18:45",
-      category: "Purchases",
-      activity: "Plastic packaging",
-      details: "3 items",
-      co2: "0.75 kg",
-      notes: "Grocery shopping",
-    },
-  ];
+  const router = useRouter();
+  const token = useUserStore((state) => state.userToken);
+  const [acts, setActs] = useState([]);
+
+  useEffect(() => {
+    if (!token) return; // wait until token is available
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/act/getUserAct", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setActs(response?.data?.acts);
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || error.message);
+      }
+    };
+
+    fetchData();
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-gray-50">
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex items-center space-x-4 mb-4">
+          {/* Left Arrow Button */}
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="text-emerald-600 hover:text-emerald-800 transition">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-semibold">Dashboard</h1>
+        </div>
+
         <div className="space-y-6">
           {/* Filters */}
           <Card>
@@ -158,33 +149,39 @@ export default function MyLogsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {logs.map((log) => (
-                    <TableRow key={log.id}>
+                  {acts.map((act: any) => (
+                    <TableRow key={act._id}>
                       <TableCell>
-                        <div className="font-medium">{log.date}</div>
-                        <div className="text-sm text-gray-600">{log.time}</div>
+                        <div className="font-medium">
+                          {formatDate(act.createdAt)}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {formatTimeWithIntl(act.createdAt)}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Badge
                           variant={
-                            log.category === "Transport"
+                            act.category.toLowerCase() === "transport"
                               ? "default"
-                              : log.category === "Diet"
+                              : act.category.toLowerCase() === "foods"
                               ? "secondary"
-                              : log.category === "Energy Use"
+                              : act.category.toLowerCase() === "energy use"
                               ? "outline"
                               : "default"
                           }>
-                          {log.category}
+                          {act.category}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">
-                        {log.activity}
+                        {act.activity}
                       </TableCell>
-                      <TableCell>{log.details}</TableCell>
-                      <TableCell className="font-bold">{log.co2}</TableCell>
+                      <TableCell>
+                        {act.details} {getUnit(act.category)}
+                      </TableCell>
+                      <TableCell className="font-bold">{act.CO2}</TableCell>
                       <TableCell className="text-sm text-gray-600">
-                        {log.notes}
+                        {act.note}
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
