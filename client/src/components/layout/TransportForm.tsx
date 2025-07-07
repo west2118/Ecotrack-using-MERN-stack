@@ -15,17 +15,30 @@ import { useRouter } from "next/navigation";
 type FormData = {
   distance: string;
   notes: string;
+  activity: string;
 };
 
-const TransportForm = () => {
+type TransportFormProps = {
+  category: string;
+  content: string;
+};
+
+const TransportForm = ({ category, content }: TransportFormProps) => {
   const router = useRouter();
   const token = useUserStore((state) => state.userToken);
   const userUid = useUserStore((state) => state.user?.uid);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { formData, handleChange } = useForm<FormData>({
+  const { formData, handleChange, setField } = useForm<FormData>({
     distance: "",
     notes: "",
+    activity: "",
   });
+
+  useEffect(() => {
+    if (content && category === "Transport") {
+      setField("activity", content);
+    }
+  }, [content]);
 
   const getCO2 = async (distance: number) => {
     try {
@@ -48,15 +61,19 @@ const TransportForm = () => {
 
     setIsLoading(true);
 
-    try {
-      const CO2 = await getCO2(Number(formData.distance));
+    const CO2 = await getCO2(Number(formData.distance));
 
+    if (CO2 == null) {
+      throw new Error("Failed to calculate CO₂. Please try again.");
+    }
+
+    try {
       const response = await axios.post(
         "/api/act/postAct",
         {
           CO2,
           category: "Transport",
-          activity: "Drove a car",
+          activity: formData.activity,
           details: formData.distance,
           note: formData.notes,
           userUid,
@@ -68,7 +85,7 @@ const TransportForm = () => {
         }
       );
 
-      console.log(response.data);
+      toast.success(response?.data?.message);
       router.push("/logs");
     } catch (error: any) {
       toast.error(error.response?.data?.message || error.message);
@@ -80,19 +97,33 @@ const TransportForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-6">
-        <div className="space-y-2">
-          <Label>Distance (km)</Label>
-          <Input
-            name="distance"
-            value={formData.distance}
-            onChange={handleChange}
-            className="py-4.5"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={7}
-            placeholder="10"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Distance (km)</Label>
+            <Input
+              name="distance"
+              value={formData.distance}
+              onChange={handleChange}
+              className="py-4.5"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={7}
+              placeholder="10"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Activity</Label>
+            <Input
+              name="activity"
+              value={formData.activity}
+              onChange={handleChange}
+              className="py-4.5"
+              type="text"
+              placeholder="e.g., Car, Bike"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -106,7 +137,10 @@ const TransportForm = () => {
         </div>
       </div>
       <div className="flex justify-between">
-        <Button type="button" variant="outline">
+        <Button
+          onClick={() => router.push("/dashboard")}
+          type="button"
+          variant="outline">
           Cancel
         </Button>
         <Button

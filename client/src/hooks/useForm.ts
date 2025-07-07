@@ -15,5 +15,12 @@ export function useForm<T extends Record<string, any>>(initialValues: T) {
     }));
   };
 
-  return { formData, handleChange };
+  const setField = (name: keyof T, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  return { formData, handleChange, setField };
 }

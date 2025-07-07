@@ -12,7 +12,8 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const navButtons = [
   {
@@ -96,7 +97,13 @@ const navButtons = [
 ];
 
 export default function AddActivityPage() {
-  const [activeTab, setActiveTab] = useState("Transport");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const categoryFromUrl = searchParams.get("category") || "Transport";
+  const contentFromUrl = searchParams.get("content") || "";
+
+  const [activeTab, setActiveTab] = useState(categoryFromUrl);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-emerald-50 to-gray-50">
@@ -114,23 +121,44 @@ export default function AddActivityPage() {
             <div className="flex border-b border-gray-200">
               {navButtons.map((btn) => (
                 <button
-                  onClick={() => setActiveTab(btn.label)}
+                  onClick={() => {
+                    setActiveTab(btn.label);
+                    router.push(`/create-activity?category=${btn.label}`);
+                  }}
                   key={btn.label}
                   className={`flex-1 py-2 px-4 flex items-center justify-center ${
                     btn.label === activeTab
                       ? "border-b-2 border-emerald-500 font-medium text-emerald-600"
                       : "text-gray-500 hover:text-gray-700"
                   }`}>
-                  {btn.icon} {btn.label}
+                  {btn.icon}{" "}
+                  {`${btn.label.charAt(0).toUpperCase()}${btn.label.slice(1)}`}
                 </button>
               ))}
             </div>
 
             {/* Transport Form (active tab) */}
-            {activeTab === "Transport" && <TransportForm />}
-            {activeTab === "Electricity" && <ElectricityForm />}
-            {activeTab === "Foods" && <FoodForm />}
-            {activeTab === "Purchases" && <PurchasesForm />}
+            {activeTab === "Transport" && (
+              <TransportForm
+                category={categoryFromUrl}
+                content={contentFromUrl}
+              />
+            )}
+            {activeTab === "Electricity" && (
+              <ElectricityForm
+                category={categoryFromUrl}
+                content={contentFromUrl}
+              />
+            )}
+            {activeTab === "Foods" && (
+              <FoodForm category={categoryFromUrl} content={contentFromUrl} />
+            )}
+            {activeTab === "Purchases" && (
+              <PurchasesForm
+                category={categoryFromUrl}
+                content={contentFromUrl}
+              />
+            )}
           </CardContent>
         </Card>
       </main>

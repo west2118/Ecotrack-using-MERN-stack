@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
@@ -19,17 +19,28 @@ type FormData = {
   activity: string;
 };
 
-const FoodForm = () => {
+type FoodFormProps = {
+  category: string;
+  content: string;
+};
+
+const FoodForm = ({ category, content }: FoodFormProps) => {
   const router = useRouter();
   const token = useUserStore((state) => state.userToken);
   const userUid = useUserStore((state) => state.user?.uid);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedFood, setSelectedFood] = useState("");
-  const { formData, handleChange } = useForm<FormData>({
+  const { formData, handleChange, setField } = useForm<FormData>({
     grams: "",
     notes: "",
     activity: "",
   });
+
+  useEffect(() => {
+    if (content && category === "Foods") {
+      setField("activity", content);
+    }
+  }, [content]);
 
   const getCO2 = async (food: string, grams: number) => {
     try {
@@ -55,6 +66,10 @@ const FoodForm = () => {
 
     const CO2 = await getCO2(selectedFood, Number(formData.grams));
 
+    if (CO2 == null) {
+      throw new Error("Failed to calculate CO₂. Please try again.");
+    }
+
     try {
       const response = await axios.post(
         "/api/act/postAct",
@@ -74,7 +89,7 @@ const FoodForm = () => {
         }
       );
 
-      console.log(response.data);
+      toast.success(response?.data?.message);
       router.push("/logs");
     } catch (error: any) {
       toast.error(error.response?.data?.message || error.message);
@@ -149,7 +164,10 @@ const FoodForm = () => {
       </div>
 
       <div className="flex justify-between">
-        <Button type="button" variant="outline">
+        <Button
+          onClick={() => router.push("/dashboard")}
+          type="button"
+          variant="outline">
           Cancel
         </Button>
         <Button

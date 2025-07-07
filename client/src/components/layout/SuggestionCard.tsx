@@ -11,32 +11,33 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { Loader } from "lucide-react";
 
 const SuggestionCard = () => {
-  const [aiSuggestion, setAiSuggestion] = useState("");
+  // const [aiSuggestion, setAiSuggestion] = useState("");
 
-  useEffect(() => {
-    let called = false;
+  // useEffect(() => {
+  //   let called = false;
 
-    const getSuggestion = async () => {
-      if (called) return;
-      called = true;
+  //   const getSuggestion = async () => {
+  //     if (called) return;
+  //     called = true;
 
-      try {
-        const response = await axios.post("/api/ai/generateSuggestion", {
-          prompt:
-            "Give me a 1–2 sentence sustainability tip to reduce personal carbon footprint. Make it specific, friendly, and include a small action with a quick impact example.",
-        });
+  //     try {
+  //       const response = await axios.post("/api/ai/generateSuggestion", {
+  //         prompt:
+  //           "Give me a 1–2 sentence sustainability tip to reduce personal carbon footprint. Make it specific, friendly, and include a small action with a quick impact example.",
+  //       });
 
-        setAiSuggestion(response.data.suggestion);
-      } catch (error: any) {
-        console.error(error);
-        toast.error(error.response?.data?.error || error.message);
-      }
-    };
+  //       setAiSuggestion(response.data.suggestion);
+  //     } catch (error: any) {
+  //       console.error(error);
+  //       toast.error(error.response?.data?.error || error.message);
+  //     }
+  //   };
 
-    getSuggestion();
-  }, []);
+  //   getSuggestion();
+  // }, []);
 
   return (
     <Card>
@@ -45,8 +46,17 @@ const SuggestionCard = () => {
         <CardDescription>Powered by OpenAI</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="p-4 bg-emerald-50 rounded-lg">
-          <p className="text-gray-700">{aiSuggestion}</p>
+        <div className="w-full bg-emerald-50 rounded-lg p-4 mx-auto">
+          {/* {!aiSuggestion ? (
+            <div className="max-w-[500px] min-w-[350px] flex items-center justify-center pr-10">
+              <Loader className="h-6 w-6 text-emerald-600 animate-spin" />
+            </div>
+          ) : (
+            <p className="text-gray-700">{aiSuggestion}</p>
+          )} */}
+          Reducing your meat consumption by just one day a week can lower your
+          annual carbon footprint by up to 500 kg CO₂ — that’s like skipping a
+          1,200 km car drive!
         </div>
         <div className="mt-4 flex justify-end">
           <Button variant="ghost" size="sm">

@@ -15,17 +15,30 @@ import { useRouter } from "next/navigation";
 type FormData = {
   watts: string;
   notes: string;
+  activity: string;
 };
 
-const ElectricityForm = () => {
+type ElectricityFormProps = {
+  category: string;
+  content: string;
+};
+
+const ElectricityForm = ({ category, content }: ElectricityFormProps) => {
   const router = useRouter();
   const token = useUserStore((state) => state.userToken);
   const user = useUserStore((state) => state.user);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { formData, handleChange } = useForm<FormData>({
+  const { formData, handleChange, setField } = useForm<FormData>({
     watts: "",
     notes: "",
+    activity: "",
   });
+
+  useEffect(() => {
+    if (content && category === "Electricity") {
+      setField("activity", content);
+    }
+  }, [content]);
 
   const getCO2 = async (watts: number) => {
     try {
@@ -49,30 +62,32 @@ const ElectricityForm = () => {
 
     setIsLoading(true);
 
+    const CO2 = await getCO2(Number(formData.watts));
+
+    if (CO2 == null) {
+      throw new Error("Failed to calculate CO₂. Please try again.");
+    }
+
     try {
-      const CO2 = await getCO2(Number(formData.watts));
-
-      if (CO2) {
-        const response = await axios.post(
-          "/api/act/postAct",
-          {
-            CO2,
-            category: "Energy Use",
-            activity: "Air Conditioning",
-            details: formData.watts,
-            note: formData.notes,
-            user: user?.uid,
+      const response = await axios.post(
+        "/api/act/postAct",
+        {
+          CO2,
+          category: "Energy Use",
+          activity: formData.activity,
+          details: formData.watts,
+          note: formData.notes,
+          user: user?.uid,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        }
+      );
 
-        console.log(response.data);
-        router.push("/logs");
-      }
+      toast.success(response?.data?.message);
+      router.push("/logs");
     } catch (error: any) {
       toast.error(error.response?.data?.message || error.message);
     } finally {
@@ -83,19 +98,35 @@ const ElectricityForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-6">
-        <div className="space-y-2">
-          <Label>Watts (mwh)</Label>
-          <Input
-            name="watts"
-            value={formData.watts}
-            onChange={handleChange}
-            className="py-4.5"
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={7}
-            placeholder="10"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          {/* Watts input */}
+          <div className="space-y-2">
+            <Label>Watts (mwh)</Label>
+            <Input
+              name="watts"
+              value={formData.watts}
+              onChange={handleChange}
+              className="py-4.5"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={7}
+              placeholder="10"
+            />
+          </div>
+
+          {/* Activity input */}
+          <div className="space-y-2">
+            <Label>Activity</Label>
+            <Input
+              name="activity"
+              value={formData.activity}
+              onChange={handleChange}
+              className="py-4.5"
+              type="text"
+              placeholder="e.g., Aircon, Computer"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -109,7 +140,10 @@ const ElectricityForm = () => {
         </div>
       </div>
       <div className="flex justify-between">
-        <Button type="button" variant="outline">
+        <Button
+          onClick={() => router.push("/dashboard")}
+          type="button"
+          variant="outline">
           Cancel
         </Button>
         <Button

@@ -22,11 +22,13 @@ export async function GET(req: Request) {
       );
     }
 
-    const acts = await Act.find({ userUid: decoded.uid });
+    const items = await Act.find({ userUid: decoded.uid }).sort({
+      createdAt: -1,
+    });
 
-    if (!acts) return;
+    if (!items) return;
 
-    return NextResponse.json({ acts }, { status: 200 });
+    return NextResponse.json({ items }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },
