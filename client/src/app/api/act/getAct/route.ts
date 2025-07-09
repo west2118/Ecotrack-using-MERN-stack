@@ -5,14 +5,14 @@ import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const { category, activity, details, CO2, note, item } = await req.json();
+  const body = await req.json();
   const result = await verifyToken(req);
+
+  console.log("BODY: ", body.actId);
 
   if (!result.success) return result.response;
 
   const { decoded } = result;
-
-  console.log("Saving activity with item:", item);
 
   try {
     await dbConnect();
@@ -20,26 +20,27 @@ export async function POST(req: Request) {
     const user = await User.findOne({ uid: decoded.uid });
     if (!user) {
       return NextResponse.json(
-        { message: "User didn't exist" },
+        { message: "User doesn't exist" },
         { status: 400 }
       );
     }
 
-    const newAct = new Act({
-      userUid: decoded.uid,
-      category,
-      activity,
-      details,
-      CO2,
-      note,
-      ...(item ? { item } : {}),
-    });
-    await newAct.save();
+    const act = await Act.findById(body.actId);
+    if (!act) {
+      return NextResponse.json(
+        { message: "Activity doesn't exist" },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json(
-      { message: "Created activity successfully!", newAct },
-      { status: 200 }
-    );
+    if (act.userUid.toString() !== decoded.uid) {
+      return NextResponse.json(
+        { message: "You are not authorized for this activity" },
+        { status: 403 }
+      );
+    }
+
+    return NextResponse.json({ act }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },

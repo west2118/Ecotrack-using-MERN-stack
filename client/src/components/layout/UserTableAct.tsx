@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -5,6 +7,7 @@ import { formatDate } from "@/constants/formatDate";
 import { formatTimeWithIntl } from "@/constants/formatTimeWithIntl";
 import { Button } from "../ui/button";
 import { getUnit } from "@/constants/getUnit";
+import { useRouter } from "next/navigation";
 
 type Activity = {
   _id: string;
@@ -24,6 +27,8 @@ type UserTableActProps = {
 };
 
 const UserTableAct = ({ act }: UserTableActProps) => {
+  const router = useRouter();
+
   return (
     <TableRow>
       <TableCell>
@@ -54,7 +59,10 @@ const UserTableAct = ({ act }: UserTableActProps) => {
       <TableCell className="text-sm text-gray-600">{act.note}</TableCell>
       <TableCell>
         <div className="flex space-x-2">
-          <Button variant="ghost" size="sm">
+          <Button
+            onClick={() => router.push(`/activity/edit/${act._id}`)}
+            variant="ghost"
+            size="sm">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"

@@ -4,15 +4,17 @@ import Act from "@/models/act.model";
 import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 
-export async function POST(req: Request) {
-  const { category, activity, details, CO2, note, item } = await req.json();
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
   const result = await verifyToken(req);
+  const body = await req.json();
 
   if (!result.success) return result.response;
 
   const { decoded } = result;
-
-  console.log("Saving activity with item:", item);
 
   try {
     await dbConnect();
@@ -25,19 +27,25 @@ export async function POST(req: Request) {
       );
     }
 
-    const newAct = new Act({
-      userUid: decoded.uid,
-      category,
-      activity,
-      details,
-      CO2,
-      note,
-      ...(item ? { item } : {}),
-    });
-    await newAct.save();
+    const act = await Act.findById(id);
+    if (!act) {
+      return NextResponse.json(
+        { message: "Activity didn't exist" },
+        { status: 400 }
+      );
+    }
+
+    if (act.userUid.toString() !== decoded.uid) {
+      return NextResponse.json(
+        { message: "You dont have authorized in this activity" },
+        { status: 400 }
+      );
+    }
+
+    const updatedAct = await Act.findByIdAndUpdate(id, body, { new: true });
 
     return NextResponse.json(
-      { message: "Created activity successfully!", newAct },
+      { message: "Activity updated successfully!", updatedAct },
       { status: 200 }
     );
   } catch (error) {

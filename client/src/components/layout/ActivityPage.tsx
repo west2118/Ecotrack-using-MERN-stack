@@ -1,5 +1,6 @@
 "use client";
 
+import DynamicActivityForm from "@/components/layout/DynamicActivityForm";
 import ElectricityForm from "@/components/layout/EletricityForm";
 import FoodForm from "@/components/layout/FoodForm";
 import PurchasesForm from "@/components/layout/PurchasesForm";
@@ -12,8 +13,12 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { useRouter, useSearchParams } from "next/navigation";
+import useFetchData from "@/hooks/useFetchData";
+import { useUserStore } from "@/stores/useUserStore";
+import axios from "axios";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 const navButtons = [
   {
@@ -96,14 +101,80 @@ const navButtons = [
   },
 ];
 
-export default function AddActivityPage() {
+type Activity = {
+  _id: string;
+  userUid: string;
+  category: string;
+  activity: string;
+  details: string;
+  CO2: number;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  item: string;
+};
+
+export default function ActivityPage({ mode }: { mode: string }) {
+  const { id } = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const token = useUserStore((state) => state.userToken);
 
-  const categoryFromUrl = searchParams.get("category") || "Transport";
   const contentFromUrl = searchParams.get("content") || "";
 
+  const [itemToEdit, setItemToEdit] = useState<Activity | undefined>(undefined);
+  const [categoryFromUrl, setCategoryFromUrl] = useState(
+    searchParams.get("category") || "Transport"
+  );
   const [activeTab, setActiveTab] = useState(categoryFromUrl);
+  // const { items, loading, error, fetchData } = useFetchData<Activity>();
+
+  const isEditableTab = [
+    "Transport",
+    "Electricity",
+    "Foods",
+    "Purchases",
+  ].includes(activeTab);
+  const shouldRenderForm = mode === "create" || itemToEdit;
+
+  useEffect(() => {
+    if (!token || !id) return;
+
+    const category = searchParams.get("category");
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.post(
+          `/api/act/getAct`,
+          { actId: id },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.data?.act) {
+          setItemToEdit(response?.data?.act);
+          setActiveTab(response?.data?.act.category);
+          setCategoryFromUrl(response?.data?.act.category);
+        }
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || error.message);
+      }
+    };
+
+    fetchData();
+  }, [token, id]);
+
+  useEffect(() => {
+    const category = searchParams.get("category");
+    if (category) {
+      setCategoryFromUrl(category);
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-emerald-50 to-gray-50">
@@ -111,7 +182,9 @@ export default function AddActivityPage() {
       <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
         <Card className="border-none shadow-2xl bg-white">
           <CardHeader>
-            <CardTitle>Add New Activity</CardTitle>
+            <CardTitle>
+              {mode === "edit" ? "Edit Activity" : "Add New Activity"}
+            </CardTitle>
             <CardDescription>
               Log your daily activities to track your carbon footprint
             </CardDescription>
@@ -123,8 +196,9 @@ export default function AddActivityPage() {
                 <button
                   onClick={() => {
                     setActiveTab(btn.label);
-                    router.push(`/create-activity?category=${btn.label}`);
+                    router.push(`/activity/create?category=${btn.label}`);
                   }}
+                  disabled={mode === "edit"}
                   key={btn.label}
                   className={`flex-1 py-2 px-4 flex items-center justify-center ${
                     btn.label === activeTab
@@ -137,26 +211,12 @@ export default function AddActivityPage() {
               ))}
             </div>
 
-            {/* Transport Form (active tab) */}
-            {activeTab === "Transport" && (
-              <TransportForm
+            {isEditableTab && shouldRenderForm && (
+              <DynamicActivityForm
                 category={categoryFromUrl}
                 content={contentFromUrl}
-              />
-            )}
-            {activeTab === "Electricity" && (
-              <ElectricityForm
-                category={categoryFromUrl}
-                content={contentFromUrl}
-              />
-            )}
-            {activeTab === "Foods" && (
-              <FoodForm category={categoryFromUrl} content={contentFromUrl} />
-            )}
-            {activeTab === "Purchases" && (
-              <PurchasesForm
-                category={categoryFromUrl}
-                content={contentFromUrl}
+                activity={itemToEdit}
+                mode={mode}
               />
             )}
           </CardContent>

@@ -20,7 +20,7 @@ type FormData = {
 
 type TransportFormProps = {
   category: string;
-  content: string;
+  content?: string;
 };
 
 const TransportForm = ({ category, content }: TransportFormProps) => {

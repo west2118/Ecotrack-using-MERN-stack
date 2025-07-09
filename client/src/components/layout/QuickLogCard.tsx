@@ -49,7 +49,7 @@ const QuickLogCard = () => {
             </CardDescription>
           </div>
           <button
-            onClick={() => router.push("/create-activity")}
+            onClick={() => router.push("/activity/create")}
             className="text-white bg-emerald-600 hover:bg-emerald-700 rounded-full w-8 h-8 flex items-center justify-center"
             title="Create Activity">
             <Plus className="w-4 h-4" />
@@ -63,7 +63,7 @@ const QuickLogCard = () => {
             <Button
               onClick={() =>
                 router.push(
-                  `/create-activity?category=${activity.category}&content=${activity.label} `
+                  `/activity/create?category=${activity.category}&content=${activity.label} `
                 )
               }
               key={activity.label}

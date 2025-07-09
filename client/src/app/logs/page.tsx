@@ -30,6 +30,8 @@ import { useRouter } from "next/navigation";
 import useFetchData from "@/hooks/useFetchData";
 import { useUserStore } from "@/stores/useUserStore";
 import UserTableAct from "@/components/layout/UserTableAct";
+import TotalSummaryCard from "@/components/layout/TotalSummaryCard";
+import Pagination from "@/components/layout/Pagination";
 
 type Activity = {
   _id: string;
@@ -44,9 +46,15 @@ type Activity = {
   __v: number;
 };
 
+const itemsPerPage = 10;
+
 export default function MyLogsPage() {
   const token = useUserStore((state) => state.userToken);
   const router = useRouter();
+  const [dateFilter, setDateFilter] = useState("week");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const { items, loading, error, fetchData } = useFetchData<Activity>();
 
   useEffect(() => {
@@ -54,6 +62,42 @@ export default function MyLogsPage() {
 
     fetchData("/api/act/getUserAct", token);
   }, [token]);
+
+  const totalCO2 = items.reduce((sum, item) => sum + item.CO2, 0);
+
+  const filteredItems = items.filter((item) => {
+    const matchCategory =
+      categoryFilter === "all" || item.category === categoryFilter;
+
+    const matchSearch =
+      item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.activity.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.note.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const createdAt = new Date(item.createdAt);
+    const now = new Date();
+
+    let matchDate = true;
+    if (dateFilter === "today") {
+      matchDate = createdAt.toDateString() === new Date().toDateString();
+    } else if (dateFilter === "week") {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(now.getDate() - 7);
+      matchDate = createdAt >= sevenDaysAgo;
+    } else if (dateFilter === "month") {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(now.getDate() - 30);
+      matchDate = createdAt >= thirtyDaysAgo;
+    }
+
+    return matchCategory && matchSearch && matchDate;
+  });
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const paginatedItems = filteredItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
@@ -81,36 +125,39 @@ export default function MyLogsPage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
                   <Label>Date Range</Label>
-                  <Select>
+                  <Select onValueChange={(value) => setDateFilter(value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Last 7 days" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="today">Today</SelectItem>
                       <SelectItem value="week">Last 7 days</SelectItem>
                       <SelectItem value="month">Last 30 days</SelectItem>
-                      <SelectItem value="custom">Custom range</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Category</Label>
-                  <Select>
+                  <Select onValueChange={(value) => setCategoryFilter(value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="All categories" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       <SelectItem value="all">All categories</SelectItem>
-                      <SelectItem value="transport">Transport</SelectItem>
-                      <SelectItem value="diet">Diet</SelectItem>
-                      <SelectItem value="energy">Energy Use</SelectItem>
-                      <SelectItem value="purchases">Purchases</SelectItem>
+                      <SelectItem value="Transport">Transport</SelectItem>
+                      <SelectItem value="Foods">Foods</SelectItem>
+                      <SelectItem value="Energy Use">Energy Use</SelectItem>
+                      <SelectItem value="Purchases">Purchases</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Search</Label>
-                  <Input placeholder="Search activities..." />
+                  <Input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search activities..."
+                  />
                 </div>
               </div>
             </CardContent>
@@ -127,7 +174,8 @@ export default function MyLogsPage() {
                   </CardDescription>
                 </div>
                 <div className="text-sm text-gray-600">
-                  Total CO₂: <span className="font-bold">8.6 kg</span>
+                  Total CO₂:{" "}
+                  <span className="font-bold">{totalCO2.toFixed(2)} kg</span>
                 </div>
               </div>
             </CardHeader>
@@ -153,8 +201,10 @@ export default function MyLogsPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ) : items.length > 0 ? (
-                    items.map((act) => <UserTableAct key={act._id} act={act} />)
+                  ) : filteredItems.length > 0 ? (
+                    paginatedItems.map((act) => (
+                      <UserTableAct key={act._id} act={act} />
+                    ))
                   ) : (
                     <TableRow>
                       <TableCell colSpan={10}>
@@ -166,41 +216,19 @@ export default function MyLogsPage() {
                   )}
                 </TableBody>
               </Table>
+
+              {!loading && filteredItems.length > 0 && (
+                <Pagination
+                  setCurrentPage={setCurrentPage}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                />
+              )}
             </CardContent>
           </Card>
 
           {/* Summary Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Weekly Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <Label>Total CO₂</Label>
-                  <div className="text-2xl font-bold">8.6 kg</div>
-                  <div className="text-sm text-gray-600">
-                    ↓ 1.4kg from last week
-                  </div>
-                </div>
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <Label>Transport Impact</Label>
-                  <div className="text-2xl font-bold">3.85 kg</div>
-                  <div className="text-sm text-gray-600">45% of total</div>
-                </div>
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <Label>Diet Impact</Label>
-                  <div className="text-2xl font-bold">2.8 kg</div>
-                  <div className="text-sm text-gray-600">33% of total</div>
-                </div>
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <Label>Activities Logged</Label>
-                  <div className="text-2xl font-bold">5</div>
-                  <div className="text-sm text-gray-600">1.2 per day</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <TotalSummaryCard items={items} totalCO2={totalCO2} />
         </div>
       </main>
     </div>
