@@ -5,6 +5,7 @@ import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 
 // test
+// test 2
 
 export async function PUT(
   req: Request,
