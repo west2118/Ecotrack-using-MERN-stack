@@ -21,6 +21,7 @@ export default function RootLayout({
         <main>
           <UserSyncProvider />
           {children}
+          <div id="modal-root" />
           <ToastContainer position="top-right" autoClose={3000} />
         </main>
         <footer></footer>

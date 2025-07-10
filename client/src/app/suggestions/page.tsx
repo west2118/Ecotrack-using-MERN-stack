@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,12 +13,113 @@ import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useUserStore } from "@/stores/useUserStore";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import useFetchData from "@/hooks/useFetchData";
+import { targets } from "@/constants/targets";
+
+type Activity = {
+  _id: string;
+  userUid: string;
+  category: string;
+  activity: string;
+  details: string;
+  CO2: number;
+  note: string;
+  item: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
 
 export default function AISuggestionsPage() {
+  const router = useRouter();
+  const userTarget = useUserStore((state) => state.user?.target);
+  const token = useUserStore((state) => state.userToken);
+
+  const [showAll, setShowAll] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [resultArray, setResultArray] = useState<any>([]);
+
+  const {
+    items: weeklyItems,
+    fetchData: fetchWeekly,
+    loading: loadingWeekly,
+  } = useFetchData<Activity>();
+
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (!token) return;
+
+    fetchWeekly("/api/act/getUserActRange?range=weekly", token);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || hasFetched.current) return;
+
+    hasFetched.current = true;
+
+    setIsLoading(true);
+
+    const getSuggestion = async () => {
+      try {
+        const response = await axios.get("/api/ai/suggestions", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setResultArray(response?.data);
+        console.log("Data: ", response?.data);
+      } catch (error: any) {
+        console.error(error);
+        toast.error(error.response?.data?.error || error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getSuggestion();
+  }, [token]);
+
+  const sumCO2 = (items: Activity[]) =>
+    items.reduce((sum, item) => sum + (item.CO2 || 0), 0);
+
+  const totalWeekly = sumCO2(weeklyItems).toFixed(2);
+  const targetGoal =
+    targets?.find((target) => target.value === userTarget)?.kg || 1;
+  const progressPercent =
+    Math.min((Number(totalWeekly) / targetGoal) * 100, 100) || 0;
+
+  if (isLoading) {
+    return (
+      <div className="h-screeen flex items-center justify-center">
+        <p>Is Loading...</p>
+      </div>
+    );
+  }
+
+  console.log(resultArray);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-gray-50">
       {/* Main Content */}
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex items-center space-x-4 mb-4">
+          {/* Left Arrow Button */}
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="text-emerald-600 hover:text-emerald-800 transition">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-semibold">Dashboard</h1>
+        </div>
+
         <div className="space-y-6">
           {/* Weekly Goals Review */}
           <Card>
@@ -30,23 +133,35 @@ export default function AISuggestionsPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Carbon Reduction Goal</Label>
-                  <Badge variant="outline">63% complete</Badge>
+                  <Badge variant="outline">
+                    {Math.floor(progressPercent)}% complete
+                  </Badge>
                 </div>
-                <Progress value={63} className="h-2" />
-                <p className="text-sm text-gray-600">
-                  You've reduced your carbon footprint by 3.2kg this week
-                  (target: 5kg)
+                <Progress
+                  value={progressPercent}
+                  className="w-full bg-gray-200"
+                />
+                <p className="text-sm text-gray-500">
+                  <span
+                    className={`font-semibold ${
+                      Number(totalWeekly) > targetGoal
+                        ? "text-red-700"
+                        : "text-gray-700"
+                    }`}>
+                    {Math.abs(targetGoal - Number(totalWeekly)).toFixed(2)}kg
+                  </span>{" "}
+                  {Number(totalWeekly) > targetGoal
+                    ? "over your weekly carbon goal"
+                    : "remaining to hit weekly target"}{" "}
+                  ({targetGoal}kg)
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label>Motivational Message</Label>
                 <div className="p-4 bg-emerald-50 rounded-lg">
-                  <p className="text-gray-700 italic">
-                    "Great progress this week! Your decision to take the train
-                    twice instead of driving saved approximately 2.1kg of CO₂.
-                    Small changes like this add up to make a big difference for
-                    our planet!"
+                  <p className="text-gray-700 italic text-center">
+                    {resultArray[0]?.motivational}
                   </p>
                 </div>
               </div>
@@ -62,144 +177,76 @@ export default function AISuggestionsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-emerald-600">
-                        <path d="M12 2v4"></path>
-                        <path d="m16.24 7.76 2.83-2.83"></path>
-                        <path d="M18 12h4"></path>
-                        <path d="m16.24 16.24 2.83 2.83"></path>
-                        <path d="M12 18v4"></path>
-                        <path d="m7.76 16.24-2.83 2.83"></path>
-                        <path d="M6 12H2"></path>
-                        <path d="m7.76 7.76-2.83-2.83"></path>
-                      </svg>
+              {(showAll ? resultArray.slice(1) : resultArray.slice(1, 4)).map(
+                (act: any, index: number) => (
+                  <div key={index} className="p-4 border rounded-lg">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-emerald-600">
+                            <path d="M12 2v4"></path>
+                            <path d="m16.24 7.76 2.83-2.83"></path>
+                            <path d="M18 12h4"></path>
+                            <path d="m16.24 16.24 2.83 2.83"></path>
+                            <path d="M12 18v4"></path>
+                            <path d="m7.76 16.24-2.83 2.83"></path>
+                            <path d="M6 12H2"></path>
+                            <path d="m7.76 7.76-2.83-2.83"></path>
+                          </svg>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{act.title} Tip</h3>
+                        <p className="text-gray-700">{act.tip}</p>
+                        <div className="mt-2">
+                          <p className="text-sm font-medium">
+                            Potential savings: {act.potentialSavings}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium">Transport Tip</h3>
-                    <p className="text-gray-700">
-                      "Try biking to work just once a week. Based on your 15km
-                      commute, this could save ~3kg CO₂ weekly. Consider routes
-                      along Main St and 5th Ave which have bike lanes."
-                    </p>
-                    <div className="mt-2">
-                      <Badge variant="secondary">
-                        Potential savings: 12kg/month
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-emerald-600">
-                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <path d="M16 10a4 4 0 0 1-8 0"></path>
-                      </svg>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Diet Tip</h3>
-                    <p className="text-gray-700">
-                      "Switch one beef meal per week to chicken or fish. Your
-                      beef consumption accounts for 40% of your diet-related
-                      emissions. This simple change could reduce your food
-                      carbon footprint by 25%."
-                    </p>
-                    <div className="mt-2">
-                      <Badge variant="secondary">
-                        Potential savings: 4.8kg/month
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-emerald-600">
-                        <path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M5.636 5.636l3.536 3.536m0 5.656l-3.536 3.536M12 12h.01"></path>
-                      </svg>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Energy Tip</h3>
-                    <p className="text-gray-700">
-                      "Set your AC 1°C higher (e.g., 24°C instead of 23°C). Your
-                      3 hours of daily AC use in summer could be 10% more
-                      efficient, saving ~0.5kg CO₂ per week without noticeable
-                      comfort change."
-                    </p>
-                    <div className="mt-2">
-                      <Badge variant="secondary">
-                        Potential savings: 2kg/month
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                )
+              )}
             </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                More Suggestions
-              </Button>
-            </CardFooter>
+
+            {resultArray.length > 4 && (
+              <CardFooter>
+                <Button
+                  onClick={() => setShowAll(!showAll)}
+                  variant="outline"
+                  className="w-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="mr-2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  Show {showAll ? "Less" : "More"} Suggestions
+                </Button>
+              </CardFooter>
+            )}
           </Card>
 
           {/* Weekly Challenge */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>This Week's Challenge</CardTitle>
               <CardDescription>
@@ -225,7 +272,7 @@ export default function AISuggestionsPage() {
                 Join Challenge
               </Button>
             </CardFooter>
-          </Card>
+          </Card> */}
         </div>
       </main>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/constants/formatDate";
@@ -8,6 +8,10 @@ import { formatTimeWithIntl } from "@/constants/formatTimeWithIntl";
 import { Button } from "../ui/button";
 import { getUnit } from "@/constants/getUnit";
 import { useRouter } from "next/navigation";
+import { DeleteActivityModal } from "./DeleteActivityModal";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useUserStore } from "@/stores/useUserStore";
 
 type Activity = {
   _id: string;
@@ -28,6 +32,26 @@ type UserTableActProps = {
 
 const UserTableAct = ({ act }: UserTableActProps) => {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const token = useUserStore((state) => state.userToken);
+
+  const handleDeleteActivity = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await axios.delete(`/api/act/${act._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success(response?.data.message);
+      setIsModalOpen(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <TableRow>
@@ -55,7 +79,7 @@ const UserTableAct = ({ act }: UserTableActProps) => {
       <TableCell>
         {act.details} {getUnit(act.category)}
       </TableCell>
-      <TableCell className="font-bold">{act.CO2}</TableCell>
+      <TableCell className="font-bold">{act.CO2.toFixed(2)}</TableCell>
       <TableCell className="text-sm text-gray-600">{act.note}</TableCell>
       <TableCell>
         <div className="flex space-x-2">
@@ -77,7 +101,10 @@ const UserTableAct = ({ act }: UserTableActProps) => {
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button
+            onClick={() => setIsModalOpen(true)}
+            variant="ghost"
+            size="sm">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -96,6 +123,13 @@ const UserTableAct = ({ act }: UserTableActProps) => {
           </Button>
         </div>
       </TableCell>
+
+      <DeleteActivityModal
+        isModalOpen={isModalOpen}
+        isCloseModal={() => setIsModalOpen(false)}
+        handleDeleteActivity={handleDeleteActivity}
+        isLoading={isLoading}
+      />
     </TableRow>
   );
 };

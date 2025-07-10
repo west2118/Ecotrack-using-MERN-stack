@@ -126,7 +126,7 @@ const DailyImpactCard = () => {
                     ? "text-red-700"
                     : "text-gray-700"
                 }`}>
-                {Math.abs(targetGoal - Number(totalWeekly))}kg
+                {Math.abs(targetGoal - Number(totalWeekly)).toFixed(2)}kg
               </span>{" "}
               {Number(totalWeekly) > targetGoal
                 ? "over your weekly carbon goal"
